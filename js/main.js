@@ -24,11 +24,11 @@ var TIMES = ['12:00', '13:00', '14:00'];
 var ACTIVITIES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 
 var INFO = ['Потрясающий вид на город, отель удобно расположен в Токио, всего в нескольких шагах от станции метро Shiodome.',
-  'Отель Tokyo Prince расположен всего в 3 минутах ходьбы от телевизионной башни Токио.',
+  'Отель расположен всего в 3 минутах ходьбы от телевизионной башни Токио.',
   'Капсульный отель в 4 минутах ходьбы от железнодорожного вокзала Синономэ на линии Ринкай.',
-  'Отель Act Shibuya удобно расположен в районе Мегуро Вард, в 600 м от храма Камимегуро-Хикава, в 800 м от парка Сугекари.',
-  'Отель Tokyu Stay Aoyama Premier находится в 2 минутах ходьбы от станции метро Gaienmae.',
-  'Отель Belken Kanda расположен в Токио, в 2,1 км от Императорского дворца и в 2,7 км от национального стадиона сумо «Рёгоку Кокугикан.'];
+  'Отель удобно расположен в районе Мегуро Вард, в 600 м от храма Камимегуро-Хикава, в 800 м от парка Сугекари.',
+  'Отель находится в 2 минутах ходьбы от станции метро Gaienmae.',
+  'Отель расположен в 2,1 км от Императорского дворца и в 2,7 км от национального стадиона сумо «Рёгоку Кокугикан.'];
 
 var IMAGES = [
   'http://o0.github.io/assets/images/tokyo/hotel1.jpg',
@@ -39,25 +39,20 @@ var map = document.querySelector('.map');
 var mapPinsTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
 var pinListElement = document.querySelector('.map__pins');
 
-var mapActivate = function () {
+var activateMap = function () {
   map.classList.remove('map--faded');
 };
 
 function getRandomIntInclusive(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function shuffleArray(arr) {
-  for (var i = arr.length - 1; i > 0; i--) {
-    var j = Math.floor(Math.random() * (i + 1));
-    var temp = arr[j];
-    arr[j] = arr[i];
-    arr[i] = temp;
-  }
-  return arr;
-}
+var getRandomSubArray = function (array) {
+  array.sort(function () {
+    return Math.random() - 0.5;
+  });
+  return array.slice(0, getRandomIntInclusive(1, array.length));
+};
 
 var getRandomArrElement = function (array) {
   var random = array[Math.floor(Math.random() * array.length)];
@@ -80,9 +75,9 @@ var createData = function (number) {
         guests: getRandomIntInclusive(1, MAX_ADULTS),
         checkin: getRandomArrElement(TIMES),
         checkout: getRandomArrElement(TIMES),
-        features: shuffleArray(ACTIVITIES),
+        features: getRandomSubArray(ACTIVITIES),
         description: getRandomArrElement(INFO),
-        photos: shuffleArray(IMAGES)
+        photos: getRandomSubArray(IMAGES)
       },
 
       location: {
@@ -115,11 +110,10 @@ var createPins = function (rents) {
   pinListElement.appendChild(fragment);
 };
 
-var newArray = function () {
-  mapActivate();
+var createNewArray = function () {
+  activateMap();
   var advArray = createData(NUMBER_OF_ITEMS);
   createPins(advArray);
 };
 
-newArray();
-
+createNewArray();
