@@ -67,7 +67,7 @@ var IMAGES = [
 
 var map = document.querySelector('.map');
 var mapPinsTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
-var pinListElement = document.querySelector('.map__pins');
+var pinListBlock = document.querySelector('.map__pins');
 var cardTemplate = document.querySelector('#card').content.querySelector('.map__card');
 var mapFiltersContainer = document.querySelector('.map__filters-container');
 
@@ -140,13 +140,13 @@ var createPins = function (rents) {
     fragment.appendChild(renderPin(rents[i]));
   }
 
-  pinListElement.appendChild(fragment);
+  pinListBlock.appendChild(fragment);
 };
 
 function renderCards(advertisment) {
   var mapMark = cardTemplate.cloneNode(true);
   var photoFragment = document.createDocumentFragment();
-  var photoElement = mapMark.querySelector('.popup__photo');
+  var photoPopup = mapMark.querySelector('.popup__photo');
   var photoPart = mapMark.querySelector('.popup__photos');
   var featurePart = mapMark.querySelector('.popup__features');
   mapMark.querySelector('.popup__title').textContent = advertisment.offer.title;
@@ -161,14 +161,13 @@ function renderCards(advertisment) {
   featurePart.innerHTML = '';
   for (var i = 0; i < advertisment.offer.features.length; i++) {
     var feature = document.createElement('li');
-    feature.classList.add('popup__feature');
-    feature.classList.add('popup__feature--' + advertisment.offer.features[i]);
+    feature.classList.add('popup__feature', 'popup__feature--' + advertisment.offer.features[i]);
     featurePart.append(feature);
   }
 
   photoPart.innerHTML = '';
   for (var j = 0; j < advertisment.offer.photos.length; j++) {
-    var photo = photoElement.cloneNode(true);
+    var photo = photoPopup.cloneNode(true);
     photo.src = advertisment.offer.photos[j];
     photoFragment.appendChild(photo);
   }
