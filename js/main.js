@@ -9,6 +9,7 @@ var MIN_Y = 130;
 var MAX_Y = 630;
 var PIN_WIDTH = 50;
 var PIN_HEIGHT = 70;
+var ENTER_KEYCODE = 13;
 
 var typeOffer = {
   'flat': 'Квартира',
@@ -69,11 +70,11 @@ var map = document.querySelector('.map');
 var mapPinsTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
 var pinListElement = document.querySelector('.map__pins');
 var cardTemplate = document.querySelector('#card').content.querySelector('.map__card');
+var mapFilters = document.querySelector('.map__filters');
 var mapFiltersContainer = document.querySelector('.map__filters-container');
-
-var activateMap = function () {
-  map.classList.remove('map--faded');
-};
+var mapPinMain = document.querySelector('.map__pins--main');
+var adForm = document.querySelector('.ad-form');
+var hotelAddress = document.querySelector('#address');
 
 function getRandomIntInclusive(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -182,11 +183,36 @@ var addCard = function (advItem) {
   map.insertBefore(advertisment, mapFiltersContainer);
 };
 
-var init = function () {
-  activateMap();
-  var advArray = createData(NUMBER_OF_ITEMS);
-  createPins(advArray);
-  addCard(advArray[0]);
+var advArray = createData(NUMBER_OF_ITEMS);
+
+var onPageEntrPress = function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    activatePage();
+  }
 };
 
-init();
+function fillInnAddress(activeMode) {
+  var top = mapPinMain.offsetTop;
+  var x = mapPinMain.offsetLeft + mapPinMain.offsetWidth / 2;
+  var y = activeMode ? (top + mapPinMain.offsetHeight) : (top + mapPinMain.offsetHeight / 2);
+
+  hotelAddress.value = x + ', ' + y;
+}
+
+var onMouseMove = function () {
+  fillInnAddress();
+  activatePage();
+};
+
+var activatePage = function () {
+  map.classList.remove('map--faded');
+  adForm.classList.remove('ad-form--disabled');
+  mapFilters.classList.remove('ad-form--disabled');
+  createPins(advArray);
+  addCard(advArray[0]);
+  mapPinMain.removeEventListener('mousedown', onMouseMove);
+  document.removeEventListener('keydown', onPageEntrPress);
+};
+
+mapPinMain.addEventListener('mousedown', onMouseMove);
+document.addEventListener('keydown', onPageEntrPress);
