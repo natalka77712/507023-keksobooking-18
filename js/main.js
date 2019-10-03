@@ -74,11 +74,9 @@ var mapFiltersContainer = document.querySelector('.map__filters-container');
 var mapPinMain = document.querySelector('.map__pin--main');
 var adForm = document.querySelector('.ad-form');
 var hotelAddress = document.querySelector('#address');
-var formInput = document.querySelectorAll('input');
-var formSelect = document.querySelectorAll('select');
+var formFieldset = document.querySelectorAll('fieldset');
 var roomsCapacity = adForm.querySelector('#room_number');
 var guestsCapacity = adForm.querySelector('#capacity');
-var buttonSendForm = adForm.querySelector('.ad-form__submit');
 
 function getRandomIntInclusive(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -189,12 +187,6 @@ var addCard = function (advItem) {
 
 var advArray = createData(NUMBER_OF_ITEMS);
 
-var onPageEntrPress = function (evt) {
-  if (evt.keyCode === ENTER_KEYCODE) {
-    activatePage();
-  }
-};
-
 function fillInnAddress(activeMode) {
   var top = mapPinMain.offsetTop;
   var x = mapPinMain.offsetLeft + mapPinMain.offsetWidth / 2;
@@ -203,58 +195,63 @@ function fillInnAddress(activeMode) {
   hotelAddress.value = Math.round(x) + ', ' + Math.round(y);
 }
 
-var setDisabledInput = function (input, isDisabled) {
-  for (var i = 0; i < input.length; i++) {
-    input[i].disabled = isDisabled;
+var setDisabledFieldSet = function (fieldset, isDisabled) {
+  for (var i = 0; i < fieldset.length; i++) {
+    fieldset[i].disabled = isDisabled;
   }
 };
 
-var onMouseMove = function () {
-  fillInnAddress(true);
+var onPageEnterPress = function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    activatePage();
+  }
+};
+
+var onMapPinMousedown = function () {
   activatePage();
 };
 
 var deactivatePage = function () {
   map.classList.add('map--faded');
   adForm.classList.add('ad-form--disabled');
-  setDisabledInput(formInput, true);
-  setDisabledInput(formSelect, true);
-  mapPinMain.addEventListener('mousedown', onMouseMove);
-  document.addEventListener('keydown', onPageEntrPress);
+  setDisabledFieldSet(formFieldset, true);
+  mapPinMain.addEventListener('mousedown', onMapPinMousedown);
+  document.addEventListener('keydown', onPageEnterPress);
 };
-
-deactivatePage();
 
 var activatePage = function () {
   map.classList.remove('map--faded');
   adForm.classList.remove('ad-form--disabled');
-  setDisabledInput(formInput, false);
-  setDisabledInput(formSelect, false);
+  setDisabledFieldSet(formFieldset, false);
   createPins(advArray);
   addCard(advArray[0]);
-  mapPinMain.removeEventListener('mousedown', onMouseMove);
-  document.removeEventListener('keydown', onPageEntrPress);
+  mapPinMain.removeEventListener('mousedown', onMapPinMousedown);
+  document.removeEventListener('keydown', onPageEnterPress);
 };
 
-var testCapacityValidity = function () {
+var validateForm = function () {
   var numberRoomSelected = parseInt(roomsCapacity.value, 10);
   var numberGuestSelected = parseInt(guestsCapacity.value, 10);
 
-  if (numberRoomSelected < numberGuestSelected) {
-    if (numberRoomSelected !== '100 комнат' || numberGuestSelected !== 0) {
-      guestsCapacity.setCustomValidity('Количество гостей должно соответствовать количеству комнат');
-    }
+  if (numberRoomSelected < numberGuestSelected && numberGuestSelected !== 0) {
+    guestsCapacity.setCustomValidity('Количество гостей не должно превышать количество комнат');
   } else if (numberRoomSelected === 100 && numberGuestSelected !== 0) {
     guestsCapacity.setCustomValidity('Данное значение должно соответствовать категории "не для гостей"');
   } else if (numberRoomSelected !== 100 && numberGuestSelected === 0) {
     guestsCapacity.setCustomValidity('Категории "не для гостей", должно соответстовать количество комнат равное 100');
-  } else if (numberRoomSelected === 100 && numberGuestSelected === 0) {
-    guestsCapacity.setCustomValidity('');
   } else {
     guestsCapacity.setCustomValidity('');
   }
 };
 
-buttonSendForm.addEventListener('click', function () {
-  testCapacityValidity();
+guestsCapacity.addEventListener('change', function () {
+  validateForm();
 });
+
+roomsCapacity.addEventListener('change', function () {
+  validateForm();
+});
+
+fillInnAddress();
+deactivatePage();
+validateForm();
