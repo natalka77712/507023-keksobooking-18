@@ -244,14 +244,8 @@ var validateForm = function () {
   }
 };
 
-guestsCapacity.addEventListener('change', function () {
-  validateForm();
-});
-
-roomsCapacity.addEventListener('change', function () {
-  validateForm();
-});
+adForm.addEventListener('change', validateForm, true);
+validateForm();
 
 fillInnAddress();
 deactivatePage();
-validateForm();
