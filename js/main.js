@@ -10,6 +10,7 @@ var MAX_Y = 630;
 var PIN_WIDTH = 50;
 var PIN_HEIGHT = 70;
 var ENTER_KEYCODE = 13;
+var ESC_KEY = 27;
 
 var typeOffer = {
   'flat': 'Квартира',
@@ -68,7 +69,7 @@ var IMAGES = [
 
 var map = document.querySelector('.map');
 var mapPinsTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
-var pinListElement = document.querySelector('.map__pins');
+var pinList = document.querySelector('.map__pins');
 var cardTemplate = document.querySelector('#card').content.querySelector('.map__card');
 var mapFiltersContainer = document.querySelector('.map__filters-container');
 var mapPinMain = document.querySelector('.map__pin--main');
@@ -77,6 +78,10 @@ var hotelAddress = document.querySelector('#address');
 var formFieldset = document.querySelectorAll('fieldset');
 var roomsCapacity = adForm.querySelector('#room_number');
 var guestsCapacity = adForm.querySelector('#capacity');
+var adFormType = adForm.querySelector('#type');
+var adFormPrice = adForm.querySelector('#price');
+var adFormTimein = adForm.querySelector('#timein');
+var adFormTimeout = adForm.querySelector('#timeout');
 
 function getRandomIntInclusive(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -133,8 +138,41 @@ var renderPin = function (advertisment) {
   pin.querySelector('img').src = advertisment.author.avatar;
   pin.querySelector('img').alt = advertisment.offer.title;
 
-  return pin;
+  var mapPoint = pin;
+
+  mapPoint.addEventListener('click', function () {
+    onPointClick(advertisment);
+  });
+  mapPoint.addEventListener('keydown', function (evt) {
+    onPointEnter(evt, advertisment);
+  });
+
+  return mapPoint;
 };
+
+function onPointClick(advertisment) {
+  var popup = renderCards(advertisment);
+  renderPopup(popup);
+  hotelAddress.value = '';
+  hotelAddress.value = advertisment.location.x + ', ' + advertisment.location.y;
+}
+
+function onPointEnter(evt, advertisment) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    var popup = renderCards(advertisment);
+    renderPopup(popup);
+  }
+}
+
+function renderPopup(popup) {
+  var openedPopup = map.querySelector('.map__card.popup');
+  if (openedPopup) {
+    openedPopup.parentElement.removeChild(openedPopup);
+  }
+  var fragment = document.createDocumentFragment();
+  fragment.appendChild(popup);
+  map.insertBefore(fragment, mapFiltersContainer);
+}
 
 var createPins = function (rents) {
   var fragment = document.createDocumentFragment();
@@ -143,7 +181,7 @@ var createPins = function (rents) {
     fragment.appendChild(renderPin(rents[i]));
   }
 
-  pinListElement.appendChild(fragment);
+  pinList.appendChild(fragment);
 };
 
 function renderCards(advertisment) {
@@ -167,6 +205,23 @@ function renderCards(advertisment) {
     feature.classList.add('popup__feature');
     feature.classList.add('popup__feature--' + advertisment.offer.features[i]);
     featurePart.append(feature);
+
+    var popupClose = mapMark.querySelector('.popup__close');
+    var popup = mapMark;
+
+    var onPopupCloseButtonClick = function () {
+      popup.remove();
+      hotelAddress.value = '';
+    };
+
+    var onPopupEscPress = function (evt) {
+      if (evt.keyCode === ESC_KEY) {
+        popup.remove();
+      }
+    };
+
+    popupClose.addEventListener('click', onPopupCloseButtonClick);
+    document.addEventListener('keydown', onPopupEscPress);
   }
 
   photoPart.innerHTML = '';
@@ -217,6 +272,10 @@ var deactivatePage = function () {
   setDisabledFieldSet(formFieldset, true);
   mapPinMain.addEventListener('mousedown', onMapPinMousedown);
   document.addEventListener('keydown', onPageEnterPress);
+  adFormType.addEventListener('change', validatePrice);
+  adForm.addEventListener('change', validateTimeInOut);
+  adForm.addEventListener('change', validateTitle);
+  adForm.addEventListener('change', validateCapacity);
 };
 
 var activatePage = function () {
@@ -229,7 +288,69 @@ var activatePage = function () {
   document.removeEventListener('keydown', onPageEnterPress);
 };
 
-var validateForm = function () {
+var validateTitle = function () {
+  var titleInput = adForm.querySelector('#title');
+  titleInput.addEventListener('invalid', function () {
+    if (titleInput.validity.tooShort) {
+      titleInput.setCustomValidity('Заголовок должен состоять минимум из 30 символов');
+    } else if (titleInput.validity.tooLong) {
+      titleInput.setCustomValidity('Заголовок не должен превышать 100 символов');
+    } else if (titleInput.validity.valueMissing) {
+      titleInput.setCustomValidity('Обязательное поле');
+    }
+  });
+
+  titleInput.addEventListener('input', function (evt) {
+    var target = evt.target;
+    if (target.value.length < 30) {
+      target.setCustomValidity('Заголовок должен состоять минимум из 30 символов');
+    } else if (target.value.length > 100) {
+      target.setCustomValidity('Заголовок не должен превышать 100 символов');
+    } else {
+      target.setCustomValidity('');
+    }
+  });
+};
+
+var validatePrice = function () {
+  var priceLimits = {
+    bungalo: {
+      min: 0
+    },
+    flat: {
+      min: 1000
+    },
+    house: {
+      min: 5000
+    },
+    palace: {
+      min: 10000
+    }
+  };
+
+  var getMinPrice = function () {
+    var typeValue = adForm.value;
+    return priceLimits[typeValue].min;
+  };
+
+  adForm.addEventListener('change', function () {
+    adFormPrice.setAttribute('min', getMinPrice());
+    adFormPrice.setAttribute('placeholder', getMinPrice());
+  });
+
+  adFormPrice.setAttribute('max', '1000000');
+};
+
+var validateTimeInOut = function () {
+  adFormTimein.onchange = function () {
+    adFormTimeout.selectedIndex = this.selectedIndex;
+  };
+  adFormTimeout.onchange = function () {
+    adFormTimein.selectedIndex = this.selectedIndex;
+  };
+};
+
+var validateCapacity = function () {
   var numberRoomSelected = parseInt(roomsCapacity.value, 10);
   var numberGuestSelected = parseInt(guestsCapacity.value, 10);
 
@@ -244,14 +365,10 @@ var validateForm = function () {
   }
 };
 
-guestsCapacity.addEventListener('change', function () {
-  validateForm();
-});
-
-roomsCapacity.addEventListener('change', function () {
-  validateForm();
-});
-
+adForm.addEventListener('change', validateCapacity, true);
+validateCapacity();
+validateTitle();
+validatePrice();
+validateTimeInOut();
 fillInnAddress();
 deactivatePage();
-validateForm();
