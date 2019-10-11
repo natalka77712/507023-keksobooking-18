@@ -10,7 +10,7 @@ var MAX_Y = 630;
 var PIN_WIDTH = 50;
 var PIN_HEIGHT = 70;
 var ENTER_KEYCODE = 13;
-var ESC_KEY = 27;
+var ESC_KEYCODE = 27;
 
 var typeOffer = {
   'flat': 'Квартира',
@@ -83,9 +83,9 @@ var adFormPrice = adForm.querySelector('#price');
 var adFormTimein = adForm.querySelector('#timein');
 var adFormTimeout = adForm.querySelector('#timeout');
 
-function getRandomIntInclusive(min, max) {
+var getRandomIntInclusive = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+};
 
 var getRandomSubArray = function (array) {
   array.sort(function () {
@@ -143,42 +143,50 @@ var renderPin = function (advertisment) {
   mapPoint.addEventListener('click', function () {
     onPointClick(advertisment);
   });
-  mapPoint.addEventListener('keydown', function (evt) {
-    onPointEnter(evt, advertisment);
-  });
 
   return mapPoint;
 };
 
-function onPointClick(advertisment) {
-  var popup = renderCards(advertisment);
-  renderPopup(popup);
-  hotelAddress.value = '';
+var onPointClick = function (advertisment) {
+  var card = renderCards(advertisment);
+  renderPopup(card);
   hotelAddress.value = advertisment.location.x + ', ' + advertisment.location.y;
-}
+};
 
-function onPointEnter(evt, advertisment) {
-  if (evt.keyCode === ENTER_KEYCODE) {
-    var popup = renderCards(advertisment);
-    renderPopup(popup);
-  }
-}
+var renderPopup = function (element, data) {
+  element.addEventListener('click', function () {
+    var popupMark = document.querySelector('.map__card');
+    if (popupMark) {
+      popupMark.remove();
+    }
+    addCard(data);
 
-function renderPopup(popup) {
-  var openedPopup = map.querySelector('.map__card.popup');
-  if (openedPopup) {
-    openedPopup.parentElement.removeChild(openedPopup);
-  }
-  var fragment = document.createDocumentFragment();
-  fragment.appendChild(popup);
-  map.insertBefore(fragment, mapFiltersContainer);
-}
+    popupMark = document.querySelector('.map__card');
+    var popupCloseButton = popupMark.querySelector('.popup__close');
+
+    var closePopup = function () {
+      popupMark.remove();
+    };
+
+    popupCloseButton.addEventListener('click', function () {
+      closePopup();
+    });
+
+    document.addEventListener('keydown', function (evt) {
+      onPopupEscPress(evt, closePopup);
+    });
+  });
+};
 
 var createPins = function (rents) {
   var fragment = document.createDocumentFragment();
 
   for (var i = 0; i < rents.length; i++) {
-    fragment.appendChild(renderPin(rents[i]));
+    var pin = renderPin(rents[i]);
+
+    renderPopup(pin, rents[i]);
+
+    fragment.appendChild(pin);
   }
 
   pinList.appendChild(fragment);
@@ -205,23 +213,6 @@ function renderCards(advertisment) {
     feature.classList.add('popup__feature');
     feature.classList.add('popup__feature--' + advertisment.offer.features[i]);
     featurePart.append(feature);
-
-    var popupClose = mapMark.querySelector('.popup__close');
-    var popup = mapMark;
-
-    var onPopupCloseButtonClick = function () {
-      popup.remove();
-      hotelAddress.value = '';
-    };
-
-    var onPopupEscPress = function (evt) {
-      if (evt.keyCode === ESC_KEY) {
-        popup.remove();
-      }
-    };
-
-    popupClose.addEventListener('click', onPopupCloseButtonClick);
-    document.addEventListener('keydown', onPopupEscPress);
   }
 
   photoPart.innerHTML = '';
@@ -242,17 +233,23 @@ var addCard = function (advItem) {
 
 var advArray = createData(NUMBER_OF_ITEMS);
 
-function fillInnAddress(activeMode) {
+var fillInnAddress = function (activeMode) {
   var top = mapPinMain.offsetTop;
   var x = mapPinMain.offsetLeft + mapPinMain.offsetWidth / 2;
   var y = activeMode ? (top + mapPinMain.offsetHeight) : (top + mapPinMain.offsetHeight / 2);
 
   hotelAddress.value = Math.round(x) + ', ' + Math.round(y);
-}
+};
 
 var setDisabledFieldSet = function (fieldset, isDisabled) {
   for (var i = 0; i < fieldset.length; i++) {
     fieldset[i].disabled = isDisabled;
+  }
+};
+
+var onPopupEscPress = function (evt, action) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    action();
   }
 };
 
@@ -272,7 +269,6 @@ var deactivatePage = function () {
   setDisabledFieldSet(formFieldset, true);
   mapPinMain.addEventListener('mousedown', onMapPinMousedown);
   document.addEventListener('keydown', onPageEnterPress);
-  adFormType.addEventListener('change', validatePrice);
   adForm.addEventListener('change', validateTimeInOut);
   adForm.addEventListener('change', validateTitle);
   adForm.addEventListener('change', validateCapacity);
@@ -283,7 +279,6 @@ var activatePage = function () {
   adForm.classList.remove('ad-form--disabled');
   setDisabledFieldSet(formFieldset, false);
   createPins(advArray);
-  addCard(advArray[0]);
   mapPinMain.removeEventListener('mousedown', onMapPinMousedown);
   document.removeEventListener('keydown', onPageEnterPress);
 };
@@ -314,31 +309,21 @@ var validateTitle = function () {
 
 var validatePrice = function () {
   var priceLimits = {
-    bungalo: {
-      min: 0
-    },
-    flat: {
-      min: 1000
-    },
-    house: {
-      min: 5000
-    },
-    palace: {
-      min: 10000
-    }
+    flat: '1000',
+    bungalo: '0',
+    house: '5000',
+    palace: '10000'
   };
 
-  var getMinPrice = function () {
-    var typeValue = adForm.value;
-    return priceLimits[typeValue].min;
+  var getMinPrice = function (evt) {
+    var typeValue = evt.target.value;
+    var minPrice = parseInt(priceLimits[typeValue], 10);
+    adFormPrice.min = minPrice;
+    adFormPrice.placeholder = minPrice;
   };
 
-  adForm.addEventListener('change', function () {
-    adFormPrice.setAttribute('min', getMinPrice());
-    adFormPrice.setAttribute('placeholder', getMinPrice());
-  });
-
-  adFormPrice.setAttribute('max', '1000000');
+  adFormType.addEventListener('change', getMinPrice);
+  adFormPrice.max = MAX_COST;
 };
 
 var validateTimeInOut = function () {
@@ -365,7 +350,7 @@ var validateCapacity = function () {
   }
 };
 
-adForm.addEventListener('change', validateCapacity, true);
+adForm.addEventListener('change', validateCapacity);
 validateCapacity();
 validateTitle();
 validatePrice();
