@@ -138,22 +138,21 @@ var renderPin = function (advertisment) {
   pin.querySelector('img').src = advertisment.author.avatar;
   pin.querySelector('img').alt = advertisment.offer.title;
 
-  var mapPoint = pin;
 
-  mapPoint.addEventListener('click', function () {
+  pin.addEventListener('click', function () {
     onPointClick(advertisment);
   });
 
-  return mapPoint;
+  return pin;
 };
 
 var onPointClick = function (advertisment) {
-  var card = renderCards(advertisment);
-  renderPopup(card);
+  var card = createCard(advertisment);
+  renderCard(card);
   hotelAddress.value = advertisment.location.x + ', ' + advertisment.location.y;
 };
 
-var renderPopup = function (element, data) {
+var renderCard = function (element, data) {
   element.addEventListener('click', function () {
     var popupMark = document.querySelector('.map__card');
     if (popupMark) {
@@ -184,7 +183,7 @@ var createPins = function (rents) {
   for (var i = 0; i < rents.length; i++) {
     var pin = renderPin(rents[i]);
 
-    renderPopup(pin, rents[i]);
+    renderCard(pin, rents[i]);
 
     fragment.appendChild(pin);
   }
@@ -192,7 +191,7 @@ var createPins = function (rents) {
   pinList.appendChild(fragment);
 };
 
-function renderCards(advertisment) {
+function createCard(advertisment) {
   var mapMark = cardTemplate.cloneNode(true);
   var photoFragment = document.createDocumentFragment();
   var photoElement = mapMark.querySelector('.popup__photo');
@@ -227,7 +226,7 @@ function renderCards(advertisment) {
 }
 
 var addCard = function (advItem) {
-  var advertisment = renderCards(advItem);
+  var advertisment = createCard(advItem);
   map.insertBefore(advertisment, mapFiltersContainer);
 };
 
