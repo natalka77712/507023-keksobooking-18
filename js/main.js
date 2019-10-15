@@ -154,26 +154,33 @@ var onPointClick = function (advertisment) {
 
 var renderCard = function (element, data) {
   element.addEventListener('click', function () {
-    var popupMark = document.querySelector('.map__card');
-    if (popupMark) {
-      popupMark.remove();
+    var cardMark = document.querySelector('.map__card');
+    if (cardMark) {
+      cardMark.remove();
     }
     addCard(data);
 
-    popupMark = document.querySelector('.map__card');
-    var popupCloseButton = popupMark.querySelector('.popup__close');
+    cardMark = document.querySelector('.map__card');
+    var cardCloseButton = cardMark.querySelector('.popup__close');
 
-    var closePopup = function () {
-      popupMark.remove();
+    var closeCard = function () {
+      cardCloseButton.removeEventListener('click', clickCardCloseButton);
+      document.removeEventListener('keydown', onPopupEscPress);
+      cardMark.remove();
     };
 
-    popupCloseButton.addEventListener('click', function () {
-      closePopup();
-    });
+    var clickCardCloseButton = function (evt) {
+      closeCard(evt);
+    };
 
-    document.addEventListener('keydown', function (evt) {
-      onPopupEscPress(evt, closePopup);
-    });
+    var onPopupEscPress = function (evt) {
+      if (evt.keyCode === ESC_KEYCODE) {
+        closeCard();
+      }
+    };
+
+    cardCloseButton.addEventListener('click', clickCardCloseButton);
+    document.addEventListener('keydown', onPopupEscPress);
   });
 };
 
@@ -243,12 +250,6 @@ var fillInnAddress = function (activeMode) {
 var setDisabledFieldSet = function (fieldset, isDisabled) {
   for (var i = 0; i < fieldset.length; i++) {
     fieldset[i].disabled = isDisabled;
-  }
-};
-
-var onPopupEscPress = function (evt, action) {
-  if (evt.keyCode === ESC_KEYCODE) {
-    action();
   }
 };
 
@@ -349,7 +350,7 @@ var validateCapacity = function () {
   }
 };
 
-adForm.addEventListener('change', validateCapacity);
+adForm.addEventListener('submit', validateCapacity);
 validateCapacity();
 validateTitle();
 validatePrice();
