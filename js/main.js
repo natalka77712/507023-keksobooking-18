@@ -41,6 +41,13 @@ var ACCOMODATIONS = [
   'house',
   'bungalow'];
 
+var PRICES = {
+  flat: 1000,
+  bungalo: 0,
+  house: 5000,
+  palace: 10000
+};
+
 var TIMES = [
   '12:00',
   '13:00',
@@ -138,18 +145,7 @@ var renderPin = function (advertisment) {
   pin.querySelector('img').src = advertisment.author.avatar;
   pin.querySelector('img').alt = advertisment.offer.title;
 
-
-  pin.addEventListener('click', function () {
-    onPointClick(advertisment);
-  });
-
   return pin;
-};
-
-var onPointClick = function (advertisment) {
-  var card = createCard(advertisment);
-  renderCard(card);
-  hotelAddress.value = advertisment.location.x + ', ' + advertisment.location.y;
 };
 
 var renderCard = function (element, data) {
@@ -198,7 +194,7 @@ var createPins = function (rents) {
   pinList.appendChild(fragment);
 };
 
-function createCard(advertisment) {
+var createCard = function (advertisment) {
   var mapMark = cardTemplate.cloneNode(true);
   var photoFragment = document.createDocumentFragment();
   var photoElement = mapMark.querySelector('.popup__photo');
@@ -230,7 +226,7 @@ function createCard(advertisment) {
   photoPart.appendChild(photoFragment);
 
   return mapMark;
-}
+};
 
 var addCard = function (advItem) {
   var advertisment = createCard(advItem);
@@ -269,9 +265,6 @@ var deactivatePage = function () {
   setDisabledFieldSet(formFieldset, true);
   mapPinMain.addEventListener('mousedown', onMapPinMousedown);
   document.addEventListener('keydown', onPageEnterPress);
-  adForm.addEventListener('change', validateTimeInOut);
-  adForm.addEventListener('change', validateTitle);
-  adForm.addEventListener('change', validateCapacity);
 };
 
 var activatePage = function () {
@@ -283,18 +276,8 @@ var activatePage = function () {
   document.removeEventListener('keydown', onPageEnterPress);
 };
 
-var validateTitle = function () {
+var setLengthOfTitle = function () {
   var titleInput = adForm.querySelector('#title');
-  titleInput.addEventListener('invalid', function () {
-    if (titleInput.validity.tooShort) {
-      titleInput.setCustomValidity('Заголовок должен состоять минимум из 30 символов');
-    } else if (titleInput.validity.tooLong) {
-      titleInput.setCustomValidity('Заголовок не должен превышать 100 символов');
-    } else if (titleInput.validity.valueMissing) {
-      titleInput.setCustomValidity('Обязательное поле');
-    }
-  });
-
   titleInput.addEventListener('input', function (evt) {
     var target = evt.target;
     if (target.value.length < 30) {
@@ -302,40 +285,33 @@ var validateTitle = function () {
     } else if (target.value.length > 100) {
       target.setCustomValidity('Заголовок не должен превышать 100 символов');
     } else {
-      target.setCustomValidity('');
+      target.setCustomValidity('Поле должно быть заполнено');
     }
   });
 };
 
-var validatePrice = function () {
-  var priceLimits = {
-    flat: '1000',
-    bungalo: '0',
-    house: '5000',
-    palace: '10000'
-  };
-
-  var getMinPrice = function (evt) {
+var setInputPrice = function () {
+  var setOptions = function (evt) {
     var typeValue = evt.target.value;
-    var minPrice = parseInt(priceLimits[typeValue], 10);
+    var minPrice = parseInt(PRICES[typeValue], 10);
     adFormPrice.min = minPrice;
     adFormPrice.placeholder = minPrice;
   };
 
-  adFormType.addEventListener('change', getMinPrice);
+  adFormType.addEventListener('change', setOptions);
   adFormPrice.max = MAX_COST;
 };
 
-var validateTimeInOut = function () {
-  adFormTimein.onchange = function () {
-    adFormTimeout.selectedIndex = this.selectedIndex;
-  };
-  adFormTimeout.onchange = function () {
-    adFormTimein.selectedIndex = this.selectedIndex;
-  };
+var setTimeInOut = function () {
+  adFormTimein.addEventListener('change', function (evt) {
+    adFormTimeout.value = evt.target.value;
+  });
+  adFormTimeout.addEventListener('change', function (evt) {
+    adFormTimein.value = evt.target.value;
+  });
 };
 
-var validateCapacity = function () {
+var setGuestsNumber = function () {
   var numberRoomSelected = parseInt(roomsCapacity.value, 10);
   var numberGuestSelected = parseInt(guestsCapacity.value, 10);
 
@@ -350,10 +326,10 @@ var validateCapacity = function () {
   }
 };
 
-adForm.addEventListener('submit', validateCapacity);
-validateCapacity();
-validateTitle();
-validatePrice();
-validateTimeInOut();
-fillInnAddress();
+adForm.addEventListener('submit', setGuestsNumber, setLengthOfTitle, setInputPrice, setTimeInOut);
+setGuestsNumber();
+setLengthOfTitle();
+setInputPrice();
+setTimeInOut();
+fillInnAddress(false);
 deactivatePage();
