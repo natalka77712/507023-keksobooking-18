@@ -137,7 +137,7 @@ var createData = function (number) {
   return rents;
 };
 
-var renderPin = function (advertisment) {
+var createPin = function (advertisment) {
   var pin = mapPinsTemplate.cloneNode(true);
 
   pin.style.left = advertisment.location.x - PIN_WIDTH / 2 + 'px';
@@ -148,7 +148,7 @@ var renderPin = function (advertisment) {
   return pin;
 };
 
-var renderCard = function (element, data) {
+var onClickPin = function (element, data) {
   element.addEventListener('click', function () {
     var cardMark = document.querySelector('.map__card');
     if (cardMark) {
@@ -184,9 +184,9 @@ var createPins = function (rents) {
   var fragment = document.createDocumentFragment();
 
   for (var i = 0; i < rents.length; i++) {
-    var pin = renderPin(rents[i]);
+    var pin = createPin(rents[i]);
 
-    renderCard(pin, rents[i]);
+    onClickPin(pin, rents[i]);
 
     fragment.appendChild(pin);
   }
@@ -276,21 +276,20 @@ var activatePage = function () {
   document.removeEventListener('keydown', onPageEnterPress);
 };
 
-var setLengthOfTitle = function () {
+var setValidateLengthOfTitle = function () {
   var titleInput = adForm.querySelector('#title');
-  titleInput.addEventListener('input', function (evt) {
-    var target = evt.target;
-    if (target.value.length < 30) {
-      target.setCustomValidity('Заголовок должен состоять минимум из 30 символов');
-    } else if (target.value.length > 100) {
-      target.setCustomValidity('Заголовок не должен превышать 100 символов');
+  titleInput.addEventListener('input', function () {
+    if (titleInput.validity.tooShort) {
+      titleInput.setCustomValidity('Заголовок должен состоять минимум из 30 символов');
+    } else if (titleInput.validity.tooLong) {
+      titleInput.setCustomValidity('Заголовок не должен превышать 100 символов');
     } else {
-      target.setCustomValidity('Поле должно быть заполнено');
+      titleInput.setCustomValidity('');
     }
   });
 };
 
-var setInputPrice = function () {
+var setValidateInputPrice = function () {
   var setOptions = function (evt) {
     var typeValue = evt.target.value;
     var minPrice = parseInt(PRICES[typeValue], 10);
@@ -302,16 +301,15 @@ var setInputPrice = function () {
   adFormPrice.max = MAX_COST;
 };
 
-var setTimeInOut = function () {
-  adFormTimein.addEventListener('change', function (evt) {
-    adFormTimeout.value = evt.target.value;
-  });
-  adFormTimeout.addEventListener('change', function (evt) {
-    adFormTimein.value = evt.target.value;
-  });
-};
+adFormTimein.addEventListener('change', function (evt) {
+  adFormTimeout.value = evt.target.value;
+});
+adFormTimeout.addEventListener('change', function (evt) {
+  adFormTimein.value = evt.target.value;
+});
 
-var setGuestsNumber = function () {
+
+var validateGuestsNumber = function () {
   var numberRoomSelected = parseInt(roomsCapacity.value, 10);
   var numberGuestSelected = parseInt(guestsCapacity.value, 10);
 
@@ -326,10 +324,14 @@ var setGuestsNumber = function () {
   }
 };
 
-adForm.addEventListener('submit', setGuestsNumber, setLengthOfTitle, setInputPrice, setTimeInOut);
-setGuestsNumber();
-setLengthOfTitle();
-setInputPrice();
-setTimeInOut();
+adForm.addEventListener('change', validateGuestsNumber);
+
+var validateForm = function () {
+  validateGuestsNumber();
+  setValidateLengthOfTitle();
+  setValidateInputPrice();
+};
+validateForm();
+
 fillInnAddress(false);
 deactivatePage();
