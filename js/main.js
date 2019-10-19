@@ -161,7 +161,7 @@ var onClickPin = function (element, data) {
 
     var closeCard = function () {
       cardCloseButton.removeEventListener('click', clickCardCloseButton);
-      document.removeEventListener('keydown', onPopupEscPress);
+      document.removeEventListener('keydown', onPinEscPress);
       cardMark.remove();
     };
 
@@ -169,14 +169,14 @@ var onClickPin = function (element, data) {
       closeCard(evt);
     };
 
-    var onPopupEscPress = function (evt) {
+    var onPinEscPress = function (evt) {
       if (evt.keyCode === ESC_KEYCODE) {
         closeCard();
       }
     };
 
     cardCloseButton.addEventListener('click', clickCardCloseButton);
-    document.addEventListener('keydown', onPopupEscPress);
+    document.addEventListener('keydown', onPinEscPress);
   });
 };
 
@@ -307,7 +307,6 @@ adFormTimein.addEventListener('change', function (evt) {
 adFormTimeout.addEventListener('change', function (evt) {
   adFormTimein.value = evt.target.value;
 });
-
 
 var validateGuestsNumber = function () {
   var numberRoomSelected = parseInt(roomsCapacity.value, 10);
