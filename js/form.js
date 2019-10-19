@@ -4,8 +4,6 @@
 
   var activeMode = false;
 
-  var MAX_COST = 1000000;
-
   var PRICES = {
     flat: 1000,
     bungalo: 0,
@@ -52,7 +50,7 @@
     };
 
     adFormType.addEventListener('change', setOptions);
-    adFormPrice.max = MAX_COST;
+    adFormPrice.max = window.data.MAX_COST;
   };
 
   adFormTimein.addEventListener('change', function (evt) {
@@ -84,11 +82,8 @@
     setValidateLengthOfTitle();
     setValidateInputPrice();
   };
+  validateForm();
 
-  window.form = {
-    validateForm: validateForm,
-    fillInnAddress: fillInnAddress,
-    MAX_COST: MAX_COST,
-  };
+  fillInnAddress();
 
 })();

@@ -45,6 +45,11 @@
     });
   };
 
+  var addCard = function (advItem) {
+    var advertisment = window.createCard(advItem);
+    map.insertBefore(advertisment, mapFiltersContainer);
+  };
+
   var setDisabledFieldSet = function (fieldset, isDisabled) {
     for (var i = 0; i < fieldset.length; i++) {
       fieldset[i].disabled = isDisabled;
@@ -74,19 +79,14 @@
     adForm.classList.remove('ad-form--disabled');
     setDisabledFieldSet(formFieldset, false);
     createPins(advArray);
-    var advArray = window.createData(NUMBER_OF_ITEMS);
     mapPinMain.removeEventListener('mousedown', onMapPinMousedown);
     document.removeEventListener('keydown', onEnterPressEvent);
   };
 
-  var addCard = function (advItem) {
-    var advertisment = window.createCard(advItem);
-    map.insertBefore(advertisment, mapFiltersContainer);
-  };
+  var advArray = window.data.createData(NUMBER_OF_ITEMS);
 
   var createPins = function (rents) {
     var fragment = document.createDocumentFragment();
-
     for (var i = 0; i < rents.length; i++) {
       var pin = window.createPin(rents[i]);
 

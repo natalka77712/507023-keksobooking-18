@@ -4,6 +4,7 @@
 
   var MAX_ADULTS = 10;
   var MIN_COST = 10000;
+  var MAX_COST = 1000000;
   var MAX_SPACE = 5;
   var MIN_Y = 130;
   var MAX_Y = 630;
@@ -57,6 +58,22 @@
     'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
     'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
 
+  var getRandomIntInclusive = function (min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  };
+
+  var getRandomSubArray = function (array) {
+    array.sort(function () {
+      return Math.random() - 0.5;
+    });
+    return array.slice(0, getRandomIntInclusive(1, array.length));
+  };
+
+  var getRandomArrElement = function (array) {
+    var random = array[Math.floor(Math.random() * array.length)];
+    return random;
+  };
+
   var createData = function (number) {
     var rents = [];
 
@@ -66,28 +83,31 @@
           avatar: 'img/avatars/user0' + i + '.png'
         },
         offer: {
-          title: window.utils.getRandomArrElement(NAME_OF_HOTELS),
-          address: window.utils.getRandomArrElement(ADDRESS),
-          price: window.utils.getRandomIntInclusive(MIN_COST, window.form.MAX_COST),
-          type: window.utils.getRandomArrElement(ACCOMODATIONS),
-          rooms: window.utils.getRandomIntInclusive(1, MAX_SPACE),
-          guests: window.utils.getRandomIntInclusive(1, MAX_ADULTS),
-          checkin: window.utils.getRandomArrElement(TIMES),
-          checkout: window.utils.getRandomArrElement(TIMES),
-          features: window.utils.getRandomSubArray(ACTIVITIES),
-          description: window.utils.getRandomArrElement(INFO),
-          photos: window.utils.getRandomSubArray(IMAGES),
+          title: getRandomArrElement(NAME_OF_HOTELS),
+          address: getRandomArrElement(ADDRESS),
+          price: getRandomIntInclusive(MIN_COST, MAX_COST),
+          type: getRandomArrElement(ACCOMODATIONS),
+          rooms: getRandomIntInclusive(1, MAX_SPACE),
+          guests: getRandomIntInclusive(1, MAX_ADULTS),
+          checkin: getRandomArrElement(TIMES),
+          checkout: getRandomArrElement(TIMES),
+          features: getRandomSubArray(ACTIVITIES),
+          description: getRandomArrElement(INFO),
+          photos: getRandomSubArray(IMAGES),
         },
 
         location: {
-          x: window.utils.getRandomIntInclusive(1, document.querySelector('.map').offsetWidth),
-          y: window.utils.getRandomIntInclusive(MIN_Y, MAX_Y)
+          x: getRandomIntInclusive(1, document.querySelector('.map').offsetWidth),
+          y: getRandomIntInclusive(MIN_Y, MAX_Y)
         }
       });
     }
     return rents;
   };
 
-  window.createData = createData;
+  window.data = {
+    createData: createData,
+    MAX_COST: MAX_COST,
+  };
 
 })();
