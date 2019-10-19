@@ -10,6 +10,7 @@ var MAX_Y = 630;
 var PIN_WIDTH = 50;
 var PIN_HEIGHT = 70;
 var ENTER_KEYCODE = 13;
+var ESC_KEYCODE = 27;
 
 var typeOffer = {
   'flat': 'Квартира',
@@ -40,6 +41,13 @@ var ACCOMODATIONS = [
   'house',
   'bungalow'];
 
+var PRICES = {
+  flat: 1000,
+  bungalo: 0,
+  house: 5000,
+  palace: 10000
+};
+
 var TIMES = [
   '12:00',
   '13:00',
@@ -68,7 +76,7 @@ var IMAGES = [
 
 var map = document.querySelector('.map');
 var mapPinsTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
-var pinListElement = document.querySelector('.map__pins');
+var pinList = document.querySelector('.map__pins');
 var cardTemplate = document.querySelector('#card').content.querySelector('.map__card');
 var mapFiltersContainer = document.querySelector('.map__filters-container');
 var mapPinMain = document.querySelector('.map__pin--main');
@@ -77,10 +85,14 @@ var hotelAddress = document.querySelector('#address');
 var formFieldset = document.querySelectorAll('fieldset');
 var roomsCapacity = adForm.querySelector('#room_number');
 var guestsCapacity = adForm.querySelector('#capacity');
+var adFormType = adForm.querySelector('#type');
+var adFormPrice = adForm.querySelector('#price');
+var adFormTimein = adForm.querySelector('#timein');
+var adFormTimeout = adForm.querySelector('#timeout');
 
-function getRandomIntInclusive(min, max) {
+var getRandomIntInclusive = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+};
 
 var getRandomSubArray = function (array) {
   array.sort(function () {
@@ -125,7 +137,7 @@ var createData = function (number) {
   return rents;
 };
 
-var renderPin = function (advertisment) {
+var createPin = function (advertisment) {
   var pin = mapPinsTemplate.cloneNode(true);
 
   pin.style.left = advertisment.location.x - PIN_WIDTH / 2 + 'px';
@@ -136,17 +148,53 @@ var renderPin = function (advertisment) {
   return pin;
 };
 
+var onClickPin = function (element, data) {
+  element.addEventListener('click', function () {
+    var cardMark = document.querySelector('.map__card');
+    if (cardMark) {
+      cardMark.remove();
+    }
+    addCard(data);
+
+    cardMark = document.querySelector('.map__card');
+    var cardCloseButton = cardMark.querySelector('.popup__close');
+
+    var closeCard = function () {
+      cardCloseButton.removeEventListener('click', clickCardCloseButton);
+      document.removeEventListener('keydown', onPopupEscPress);
+      cardMark.remove();
+    };
+
+    var clickCardCloseButton = function (evt) {
+      closeCard(evt);
+    };
+
+    var onPopupEscPress = function (evt) {
+      if (evt.keyCode === ESC_KEYCODE) {
+        closeCard();
+      }
+    };
+
+    cardCloseButton.addEventListener('click', clickCardCloseButton);
+    document.addEventListener('keydown', onPopupEscPress);
+  });
+};
+
 var createPins = function (rents) {
   var fragment = document.createDocumentFragment();
 
   for (var i = 0; i < rents.length; i++) {
-    fragment.appendChild(renderPin(rents[i]));
+    var pin = createPin(rents[i]);
+
+    onClickPin(pin, rents[i]);
+
+    fragment.appendChild(pin);
   }
 
-  pinListElement.appendChild(fragment);
+  pinList.appendChild(fragment);
 };
 
-function renderCards(advertisment) {
+var createCard = function (advertisment) {
   var mapMark = cardTemplate.cloneNode(true);
   var photoFragment = document.createDocumentFragment();
   var photoElement = mapMark.querySelector('.popup__photo');
@@ -178,22 +226,22 @@ function renderCards(advertisment) {
   photoPart.appendChild(photoFragment);
 
   return mapMark;
-}
+};
 
 var addCard = function (advItem) {
-  var advertisment = renderCards(advItem);
+  var advertisment = createCard(advItem);
   map.insertBefore(advertisment, mapFiltersContainer);
 };
 
 var advArray = createData(NUMBER_OF_ITEMS);
 
-function fillInnAddress(activeMode) {
+var fillInnAddress = function (activeMode) {
   var top = mapPinMain.offsetTop;
   var x = mapPinMain.offsetLeft + mapPinMain.offsetWidth / 2;
   var y = activeMode ? (top + mapPinMain.offsetHeight) : (top + mapPinMain.offsetHeight / 2);
 
   hotelAddress.value = Math.round(x) + ', ' + Math.round(y);
-}
+};
 
 var setDisabledFieldSet = function (fieldset, isDisabled) {
   for (var i = 0; i < fieldset.length; i++) {
@@ -224,12 +272,44 @@ var activatePage = function () {
   adForm.classList.remove('ad-form--disabled');
   setDisabledFieldSet(formFieldset, false);
   createPins(advArray);
-  addCard(advArray[0]);
   mapPinMain.removeEventListener('mousedown', onMapPinMousedown);
   document.removeEventListener('keydown', onPageEnterPress);
 };
 
-var validateForm = function () {
+var setValidateLengthOfTitle = function () {
+  var titleInput = adForm.querySelector('#title');
+  titleInput.addEventListener('input', function () {
+    if (titleInput.validity.tooShort) {
+      titleInput.setCustomValidity('Заголовок должен состоять минимум из 30 символов');
+    } else if (titleInput.validity.tooLong) {
+      titleInput.setCustomValidity('Заголовок не должен превышать 100 символов');
+    } else {
+      titleInput.setCustomValidity('');
+    }
+  });
+};
+
+var setValidateInputPrice = function () {
+  var setOptions = function (evt) {
+    var typeValue = evt.target.value;
+    var minPrice = parseInt(PRICES[typeValue], 10);
+    adFormPrice.min = minPrice;
+    adFormPrice.placeholder = minPrice;
+  };
+
+  adFormType.addEventListener('change', setOptions);
+  adFormPrice.max = MAX_COST;
+};
+
+adFormTimein.addEventListener('change', function (evt) {
+  adFormTimeout.value = evt.target.value;
+});
+adFormTimeout.addEventListener('change', function (evt) {
+  adFormTimein.value = evt.target.value;
+});
+
+
+var validateGuestsNumber = function () {
   var numberRoomSelected = parseInt(roomsCapacity.value, 10);
   var numberGuestSelected = parseInt(guestsCapacity.value, 10);
 
@@ -244,14 +324,14 @@ var validateForm = function () {
   }
 };
 
-guestsCapacity.addEventListener('change', function () {
-  validateForm();
-});
+adForm.addEventListener('change', validateGuestsNumber);
 
-roomsCapacity.addEventListener('change', function () {
-  validateForm();
-});
-
-fillInnAddress();
-deactivatePage();
+var validateForm = function () {
+  validateGuestsNumber();
+  setValidateLengthOfTitle();
+  setValidateInputPrice();
+};
 validateForm();
+
+fillInnAddress(false);
+deactivatePage();
