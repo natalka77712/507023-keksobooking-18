@@ -108,6 +108,8 @@
   window.data = {
     createData: createData,
     MAX_COST: MAX_COST,
+    MIN_Y: MIN_Y,
+    MAX_Y: MAX_Y,
   };
 
 })();

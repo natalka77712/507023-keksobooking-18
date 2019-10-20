@@ -2,8 +2,6 @@
 
 (function () {
 
-  var activeMode = false;
-
   var PRICES = {
     flat: 1000,
     bungalo: 0,
@@ -11,22 +9,12 @@
     palace: 10000
   };
 
-  var hotelAddress = document.querySelector('#address');
-
   var roomsCapacity = document.querySelector('#room_number');
   var guestsCapacity = document.querySelector('#capacity');
   var adFormType = document.querySelector('#type');
   var adFormPrice = document.querySelector('#price');
   var adFormTimein = document.querySelector('#timein');
   var adFormTimeout = document.querySelector('#timeout');
-
-  var fillInnAddress = function () {
-    var top = window.map.mapPinMain.offsetTop;
-    var x = window.map.mapPinMain.offsetLeft + window.map.mapPinMain.offsetWidth / 2;
-    var y = activeMode ? (top + window.map.mapPinMain.offsetHeight) : (top + window.map.mapPinMain.offsetHeight / 2);
-
-    hotelAddress.value = Math.round(x) + ', ' + Math.round(y);
-  };
 
   var setValidateLengthOfTitle = function () {
     var titleInput = document.querySelector('#title');
@@ -83,7 +71,5 @@
     setValidateInputPrice();
   };
   validateForm();
-
-  fillInnAddress();
 
 })();
