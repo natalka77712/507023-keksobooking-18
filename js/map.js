@@ -8,7 +8,6 @@
   var MIN_X = 0;
 
   var activeMode = false;
-  var onMouseClick = false;
 
   var map = document.querySelector('.map');
   var mapPinMain = document.querySelector('.map__pin--main');
@@ -73,6 +72,7 @@
   var onEnterPressEvent = function (evt) {
     if (evt.keyCode === ENTER_KEYCODE) {
       activatePage();
+      fillInnAddress();
     }
   };
 
@@ -121,7 +121,6 @@
 
     function onMouseMove(moveEvt) {
       moveEvt.preventDefault();
-      onMouseClick = true;
 
       var shift = {
         x: startCoords.x - moveEvt.clientX,
@@ -154,16 +153,6 @@
       document.removeEventListener('mouseup', onMouseUp);
 
       fillInnAddress();
-    }
-
-    function onClickPreventDefault() {
-      evt.preventDefault();
-      mapPinMain.removeEventListener('click', onClickPreventDefault);
-    }
-
-    if (onMouseClick) {
-      onClickPreventDefault();
-      mapPinMain.addEventListener('click', onClickPreventDefault);
     }
 
     document.addEventListener('mousemove', onMouseMove);
