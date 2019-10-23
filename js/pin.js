@@ -18,6 +18,8 @@
     return pin;
   };
 
-  window.createPin = createPin;
-
+  window.pin = {
+    createPin: createPin,
+    PIN_WIDTH: PIN_WIDTH,
+  };
 })();
