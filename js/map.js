@@ -4,7 +4,6 @@
 
   var ESC_KEYCODE = 27;
   var ENTER_KEYCODE = 13;
-  var NUMBER_OF_ITEMS = 8;
   var MIN_X = 0;
 
   var activeMode = false;
@@ -92,12 +91,10 @@
     map.classList.remove('map--faded');
     adForm.classList.remove('ad-form--disabled');
     setDisabledFieldSet(formFieldset, false);
-    createPins(advArray);
+    window.request(loadSuccessHandler, loaderrorHandler);
     mapPinMain.removeEventListener('mousedown', onMapPinMousedown);
     document.removeEventListener('keydown', onEnterPressEvent);
   };
-
-  var advArray = window.data.createData(NUMBER_OF_ITEMS);
 
   var createPins = function (rents) {
     var fragment = document.createDocumentFragment();
@@ -159,6 +156,20 @@
     document.addEventListener('mouseup', onMouseUp);
 
   });
+
+  var loadSuccessHandler = function (data) {
+    createPins(data);
+  };
+
+  var loaderrorHandler = function (error) {
+    var main = document.body.querySelector('main');
+    var errorTemplate = document.querySelector('#error').content;
+    var errorWindow = errorTemplate.cloneNode(true).querySelector('.error');
+    var errorMessage = errorWindow.querySelector('.error__message');
+    errorMessage.textContent = error;
+
+    main.appendChild(errorWindow);
+  };
 
   deactivatePage();
 
