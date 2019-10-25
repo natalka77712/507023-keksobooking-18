@@ -4,7 +4,6 @@
 
   var ESC_KEYCODE = 27;
   var ENTER_KEYCODE = 13;
-  var NUMBER_OF_ITEMS = 8;
   var MIN_X = 0;
 
   var activeMode = false;
@@ -39,7 +38,7 @@
 
       var closeCard = function () {
         cardCloseButton.removeEventListener('click', clickCardCloseButton);
-        document.removeEventListener('keydown', onPinEscPress);
+        document.removeEventListener('keydown', PinEscPress);
         cardMark.remove();
       };
 
@@ -47,19 +46,19 @@
         closeCard(evt);
       };
 
-      var onPinEscPress = function (evt) {
+      var PinEscPress = function (evt) {
         if (evt.keyCode === ESC_KEYCODE) {
           closeCard();
         }
       };
 
       cardCloseButton.addEventListener('click', clickCardCloseButton);
-      document.addEventListener('keydown', onPinEscPress);
+      document.addEventListener('keydown', PinEscPress);
     });
   };
 
   var addCard = function (advItem) {
-    var advertisment = window.createCard(advItem);
+    var advertisment = window.card.createCard(advItem);
     map.insertBefore(advertisment, mapFiltersContainer);
   };
 
@@ -92,12 +91,10 @@
     map.classList.remove('map--faded');
     adForm.classList.remove('ad-form--disabled');
     setDisabledFieldSet(formFieldset, false);
-    createPins(advArray);
+    window.backend.sendRequest(window.backend.loadSuccessHandler, window.backend.loaderrorHandler);
     mapPinMain.removeEventListener('mousedown', onMapPinMousedown);
     document.removeEventListener('keydown', onEnterPressEvent);
   };
-
-  var advArray = window.data.createData(NUMBER_OF_ITEMS);
 
   var createPins = function (rents) {
     var fragment = document.createDocumentFragment();
@@ -166,6 +163,7 @@
     createPins: createPins,
     adForm: adForm,
     mapPinMain: mapPinMain,
+    ESC_KEYCODE: ESC_KEYCODE,
   };
 
 })();

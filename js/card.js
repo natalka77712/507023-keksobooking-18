@@ -45,6 +45,7 @@
     return mapMark;
   };
 
-  window.createCard = createCard;
-
+  window.card = {
+    createCard: createCard,
+  };
 })();
