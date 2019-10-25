@@ -9,7 +9,6 @@
   var MIN_Y = 130;
   var MAX_Y = 630;
 
-
   var NAME_OF_HOTELS = [
     'Park Hotel Tokyo',
     'Tokyo Prince Hotel',

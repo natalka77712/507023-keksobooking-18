@@ -38,7 +38,7 @@
 
       var closeCard = function () {
         cardCloseButton.removeEventListener('click', clickCardCloseButton);
-        document.removeEventListener('keydown', onPinEscPress);
+        document.removeEventListener('keydown', PinEscPress);
         cardMark.remove();
       };
 
@@ -46,19 +46,19 @@
         closeCard(evt);
       };
 
-      var onPinEscPress = function (evt) {
+      var PinEscPress = function (evt) {
         if (evt.keyCode === ESC_KEYCODE) {
           closeCard();
         }
       };
 
       cardCloseButton.addEventListener('click', clickCardCloseButton);
-      document.addEventListener('keydown', onPinEscPress);
+      document.addEventListener('keydown', PinEscPress);
     });
   };
 
   var addCard = function (advItem) {
-    var advertisment = window.createCard(advItem);
+    var advertisment = window.card.createCard(advItem);
     map.insertBefore(advertisment, mapFiltersContainer);
   };
 
@@ -91,7 +91,7 @@
     map.classList.remove('map--faded');
     adForm.classList.remove('ad-form--disabled');
     setDisabledFieldSet(formFieldset, false);
-    window.request(loadSuccessHandler, loaderrorHandler);
+    window.backend.sendRequest(window.backend.loadSuccessHandler, window.backend.loaderrorHandler);
     mapPinMain.removeEventListener('mousedown', onMapPinMousedown);
     document.removeEventListener('keydown', onEnterPressEvent);
   };
@@ -157,26 +157,13 @@
 
   });
 
-  var loadSuccessHandler = function (data) {
-    createPins(data);
-  };
-
-  var loaderrorHandler = function (error) {
-    var main = document.body.querySelector('main');
-    var errorTemplate = document.querySelector('#error').content;
-    var errorWindow = errorTemplate.cloneNode(true).querySelector('.error');
-    var errorMessage = errorWindow.querySelector('.error__message');
-    errorMessage.textContent = error;
-
-    main.appendChild(errorWindow);
-  };
-
   deactivatePage();
 
   window.map = {
     createPins: createPins,
     adForm: adForm,
     mapPinMain: mapPinMain,
+    ESC_KEYCODE: ESC_KEYCODE,
   };
 
 })();
