@@ -22,7 +22,9 @@
     y: mapPinMain.style.top,
   };
 
-  var onLoad = false;
+  var state = {
+    isDataLoaded: false,
+  };
 
   var fillInnAddress = function () {
     var top = window.map.mapPinMain.offsetTop;
@@ -185,16 +187,15 @@
 
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
-      if (!onLoad) {
+      if (!state.isDataLoaded) {
         activatePage();
-
-        window.backend.load(loadSuccessHandler, window.message.loaderrorHandler);
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-        mapFilters.classList.remove('ad-form--disabled');
         activateFilters();
-        fillInnAddress();
+        window.backend.load(loadSuccessHandler, window.message.loaderrorHandler);
       }
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      mapFilters.classList.remove('ad-form--disabled');
+      fillInnAddress();
     };
 
     document.addEventListener('mousemove', onMouseMove);
@@ -204,6 +205,7 @@
 
   var loadSuccessHandler = function (data) {
     createPins(data);
+    state.isDataLoaded = true;
   };
 
   deactivatePage();
