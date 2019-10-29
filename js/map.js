@@ -15,7 +15,14 @@
   var adForm = document.querySelector('.ad-form');
   var formFieldset = document.querySelectorAll('fieldset');
   var hotelAddress = document.querySelector('#address');
+  var mapFilters = document.querySelector('.map__filters');
+  var filterField = mapFilters.querySelectorAll('.map__filter');
+  var mainPinDefaultCoordinates = {
+    x: mapPinMain.style.left,
+    y: mapPinMain.style.top,
+  };
 
+  var onLoad = false;
 
   var fillInnAddress = function () {
     var top = window.map.mapPinMain.offsetTop;
@@ -23,6 +30,11 @@
     var y = activeMode ? (top + window.map.mapPinMain.offsetHeight) : (top + window.map.mapPinMain.offsetHeight / 2);
 
     hotelAddress.value = Math.round(x) + ', ' + Math.round(y);
+  };
+
+  var resetMainPinCoordinates = function () {
+    mapPinMain.style.left = mainPinDefaultCoordinates.x;
+    mapPinMain.style.top = mainPinDefaultCoordinates.y;
   };
 
   var onClickPin = function (element, data) {
@@ -68,10 +80,29 @@
     }
   };
 
+  var setDisabled = function (element) {
+    element.disabled = true;
+  };
+
+  var setActive = function (element) {
+    element.disabled = false;
+  };
+
+  var deactivateFilters = function () {
+    filterField.forEach(setDisabled);
+  };
+
+  var activateFilters = function () {
+    filterField.forEach(setActive);
+  };
+
   var onEnterPressEvent = function (evt) {
     if (evt.keyCode === ENTER_KEYCODE) {
       activatePage();
       fillInnAddress();
+      activateFilters();
+      mapFilters.classList.remove('ad-form--disabled');
+      window.backend.load(loadSuccessHandler, window.message.loaderrorHandler);
     }
   };
 
@@ -82,16 +113,19 @@
   var deactivatePage = function () {
     map.classList.add('map--faded');
     adForm.classList.add('ad-form--disabled');
+    mapFilters.classList.add('ad-form--disabled');
     setDisabledFieldSet(formFieldset, true);
+    deactivateFilters();
     mapPinMain.addEventListener('mousedown', onMapPinMousedown);
     document.addEventListener('keydown', onEnterPressEvent);
+    var pinsCollections = map.querySelectorAll('.map__pin:not(.map__pin--main)');
+    removePins(pinsCollections);
   };
 
   var activatePage = function () {
     map.classList.remove('map--faded');
     adForm.classList.remove('ad-form--disabled');
     setDisabledFieldSet(formFieldset, false);
-    window.backend.sendRequest(window.backend.loadSuccessHandler, window.backend.loaderrorHandler);
     mapPinMain.removeEventListener('mousedown', onMapPinMousedown);
     document.removeEventListener('keydown', onEnterPressEvent);
   };
@@ -109,6 +143,12 @@
     pinList.appendChild(fragment);
   };
 
+  var removePins = function (pins) {
+    for (var i = 0; i < pins.length; i++) {
+      pins[i].remove();
+    }
+  };
+
   mapPinMain.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
     var startCoords = {
@@ -116,7 +156,7 @@
       y: evt.clientY,
     };
 
-    function onMouseMove(moveEvt) {
+    var onMouseMove = function (moveEvt) {
       moveEvt.preventDefault();
 
       var shift = {
@@ -141,21 +181,30 @@
       }
 
       fillInnAddress();
-    }
+    };
 
-    function onMouseUp(upEvt) {
+    var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
+      if (!onLoad) {
+        activatePage();
 
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-
-      fillInnAddress();
-    }
+        window.backend.load(loadSuccessHandler, window.message.loaderrorHandler);
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+        mapFilters.classList.remove('ad-form--disabled');
+        activateFilters();
+        fillInnAddress();
+      }
+    };
 
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
 
   });
+
+  var loadSuccessHandler = function (data) {
+    createPins(data);
+  };
 
   deactivatePage();
 
@@ -164,6 +213,9 @@
     adForm: adForm,
     mapPinMain: mapPinMain,
     ESC_KEYCODE: ESC_KEYCODE,
+    deactivatePage: deactivatePage,
+    fillInnAddress: fillInnAddress,
+    resetMainPinCoordinates: resetMainPinCoordinates,
   };
 
 })();
