@@ -29,6 +29,10 @@
     });
   };
 
+  var reset = function () {
+    window.map.adForm.reset();
+  };
+
   var setValidateInputPrice = function () {
     var setOptions = function (evt) {
       var typeValue = evt.target.value;
@@ -71,5 +75,20 @@
     setValidateInputPrice();
   };
   validateForm();
+
+  var submitFormSuccessHandler = function () {
+    window.message.showSuccessMessage();
+    reset();
+    window.map.deactivatePage();
+    window.map.resetMainPinCoordinates();
+    window.map.fillInnAddress();
+  };
+
+  var submitErrorHandler = window.message.loaderrorHandler;
+
+  window.map.adForm.addEventListener('submit', function (evt) {
+    evt.preventDefault();
+    window.backend.upload(new FormData(window.map.adForm), submitFormSuccessHandler, submitErrorHandler);
+  });
 
 })();

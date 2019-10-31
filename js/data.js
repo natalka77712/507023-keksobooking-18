@@ -57,6 +57,10 @@
     'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
     'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
 
+  var mapFilters = document.querySelector('.map__filters');
+  var filterField = mapFilters.querySelectorAll('.map__filter');
+  var formFieldset = document.querySelectorAll('fieldset');
+
   var getRandomIntInclusive = function (min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   };
@@ -104,11 +108,41 @@
     return rents;
   };
 
+  var setDisabled = function (element) {
+    element.disabled = true;
+  };
+
+  var setActive = function (element) {
+    element.disabled = false;
+  };
+
+  var setDisabledFieldSet = function () {
+    formFieldset.forEach(setDisabled);
+  };
+
+  var setActiveFieldSet = function () {
+    formFieldset.forEach(setActive);
+  };
+
+  var deactivateFilters = function () {
+    filterField.forEach(setDisabled);
+    mapFilters.classList.add('ad-form--disabled');
+  };
+
+  var activateFilters = function () {
+    filterField.forEach(setActive);
+    mapFilters.classList.remove('ad-form--disabled');
+  };
+
   window.data = {
     createData: createData,
     MAX_COST: MAX_COST,
     MIN_Y: MIN_Y,
     MAX_Y: MAX_Y,
+    deactivateFilters: deactivateFilters,
+    activateFilters: activateFilters,
+    setDisabledFieldSet: setDisabledFieldSet,
+    setActiveFieldSet: setActiveFieldSet,
   };
 
 })();
