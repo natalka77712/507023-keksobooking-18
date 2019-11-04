@@ -13,7 +13,6 @@
     xhr.addEventListener('load', function () {
       if (xhr.status === 200) {
         onLoad(xhr.response);
-        window.data.activateFilters();
       } else {
         onError('Ошибка загрузки объявления');
       }
