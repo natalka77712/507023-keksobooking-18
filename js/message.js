@@ -4,7 +4,7 @@
 
   var main = document.body.querySelector('main');
 
-  var loaderrorHandler = function (error) {
+  var onLoadError = function (error) {
     var errorTemplate = document.querySelector('#error').content;
     var errorWindow = errorTemplate.cloneNode(true).querySelector('.error');
     var errorMessage = errorWindow.querySelector('.error__message');
@@ -14,29 +14,29 @@
     main.appendChild(errorWindow);
 
     var closeErrorWindow = function () {
-      errorButton.removeEventListener('click', clickMessageCloseButton);
-      document.removeEventListener('keydown', errowMessageEscPress);
-      document.removeEventListener('click', clickMapOpen);
+      errorButton.removeEventListener('click', onMessageClickCloseButton);
+      document.removeEventListener('keydown', onMessageErrorEscPress);
+      document.removeEventListener('click', onMapClickOpen);
       errorWindow.remove();
     };
 
-    var clickMessageCloseButton = function (evt) {
+    var onMessageClickCloseButton = function (evt) {
       closeErrorWindow(evt);
     };
 
-    var clickMapOpen = function (evt) {
+    var onMapClickOpen = function (evt) {
       closeErrorWindow(evt);
     };
 
-    var errowMessageEscPress = function (evt) {
+    var onMessageErrorEscPress = function (evt) {
       if (evt.keyCode === window.map.ESC_KEYCODE) {
         closeErrorWindow();
       }
     };
 
-    document.addEventListener('click', clickMapOpen);
-    errorButton.addEventListener('click', clickMessageCloseButton);
-    document.addEventListener('keydown', errowMessageEscPress);
+    document.addEventListener('click', onMapClickOpen);
+    errorButton.addEventListener('click', onMessageClickCloseButton);
+    document.addEventListener('keydown', onMessageErrorEscPress);
   };
 
   var showSuccessMessage = function () {
@@ -48,26 +48,26 @@
 
     var closeSuccessWindow = function () {
       successMessage.remove();
-      document.removeEventListener('keydown', successMessageEscPress);
-      document.removeEventListener('click', clickMapActive);
+      document.removeEventListener('keydown', onMessageSuccessEscPress);
+      document.removeEventListener('click', onMapClickActive);
     };
 
-    var clickMapActive = function (evt) {
+    var onMapClickActive = function (evt) {
       closeSuccessWindow(evt);
     };
 
-    var successMessageEscPress = function (evt) {
+    var onMessageSuccessEscPress = function (evt) {
       if (evt.keyCode === window.map.ESC_KEYCODE) {
         closeSuccessWindow();
       }
     };
 
-    document.addEventListener('keydown', successMessageEscPress);
-    document.addEventListener('click', clickMapActive);
+    document.addEventListener('keydown', onMessageSuccessEscPress);
+    document.addEventListener('click', onMapClickActive);
   };
 
   window.message = {
-    loaderrorHandler: loaderrorHandler,
+    onLoadError: onLoadError,
     showSuccessMessage: showSuccessMessage,
   };
 

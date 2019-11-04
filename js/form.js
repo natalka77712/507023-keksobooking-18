@@ -76,7 +76,7 @@
   };
   validateForm();
 
-  var submitFormSuccessHandler = function () {
+  var onFormSubmitSuccess = function () {
     window.message.showSuccessMessage();
     reset();
     window.map.deactivatePage();
@@ -84,11 +84,10 @@
     window.map.fillInnAddress();
   };
 
-  var submitErrorHandler = window.message.loaderrorHandler;
+  var onFormSubmitError = window.message.onLoadError;
 
   window.map.adForm.addEventListener('submit', function (evt) {
     evt.preventDefault();
-    window.backend.upload(new FormData(window.map.adForm), submitFormSuccessHandler, submitErrorHandler);
+    window.backend.upload(new FormData(window.map.adForm), onFormSubmitSuccess, onFormSubmitError);
   });
-
 })();
