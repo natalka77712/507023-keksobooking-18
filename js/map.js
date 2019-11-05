@@ -119,6 +119,8 @@
     deactivateFilters();
     document.addEventListener('keydown', onEnterPressEvent);
     removePins();
+    closeCard();
+    window.avatar.deleteImage();
     state.isDataLoaded = false;
   };
 
