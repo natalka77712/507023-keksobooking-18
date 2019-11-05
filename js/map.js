@@ -45,17 +45,17 @@
 
     if (cardMark) {
       cardMark.remove();
-      document.removeEventListener('keydown', PinEscPress);
+      document.removeEventListener('keydown', onPinEscPress);
     }
   };
 
-  var PinEscPress = function (evt) {
+  var onPinEscPress = function (evt) {
     if (evt.keyCode === ESC_KEYCODE) {
       closeCard();
     }
   };
 
-  var onClickPin = function (element, data) {
+  var onPinClick = function (element, data) {
     element.addEventListener('click', function () {
       closeCard();
       addCard(data);
@@ -66,7 +66,7 @@
         closeCard();
       });
 
-      document.addEventListener('keydown', PinEscPress);
+      document.addEventListener('keydown', onPinEscPress);
     });
   };
 
@@ -78,49 +78,45 @@
   var onEnterPressEvent = function (evt) {
     if (evt.keyCode === ENTER_KEYCODE) {
       if (!state.isDataLoaded) {
-        window.backend.load(loadSuccessHandler, window.message.loaderrorHandler);
+        window.backend.load(onLoadSuccess, window.message.onLoadError);
       }
       activatePage();
       fillInnAddress();
     }
   };
 
-  var onMapPinMousedown = function () {
-    activatePage();
-  };
-
-  var setDisabled = function (element) {
-    element.disabled = true;
-  };
-
-  var setActive = function (element) {
-    element.disabled = false;
-  };
-
   var setDisabledFieldSet = function () {
-    formFieldset.forEach(setDisabled);
+    adForm.classList.add('ad-form--disabled');
+    formFieldset.forEach(function (fieldset) {
+      fieldset.disabled = true;
+    });
   };
 
   var setActiveFieldSet = function () {
-    formFieldset.forEach(setActive);
+    adForm.classList.remove('ad-form--disabled');
+    formFieldset.forEach(function (fieldset) {
+      fieldset.disabled = false;
+    });
   };
 
   var deactivateFilters = function () {
-    filterField.forEach(setDisabled);
     mapFilters.classList.add('ad-form--disabled');
+    filterField.forEach(function (filter) {
+      filter.disabled = true;
+    });
   };
 
   var activateFilters = function () {
-    filterField.forEach(setActive);
     mapFilters.classList.remove('ad-form--disabled');
+    filterField.forEach(function (filter) {
+      filter.disabled = false;
+    });
   };
 
   var deactivatePage = function () {
     map.classList.add('map--faded');
-    adForm.classList.add('ad-form--disabled');
     setDisabledFieldSet();
     deactivateFilters();
-    mapPinMain.addEventListener('mousedown', onMapPinMousedown);
     document.addEventListener('keydown', onEnterPressEvent);
     removePins();
     state.isDataLoaded = false;
@@ -128,7 +124,6 @@
 
   var activatePage = function () {
     map.classList.remove('map--faded');
-    adForm.classList.remove('ad-form--disabled');
     setActiveFieldSet();
     mapPinMain.removeEventListener('mousedown', onMapPinMousedown);
     document.removeEventListener('keydown', onEnterPressEvent);
@@ -141,7 +136,7 @@
     for (var i = 0; i <= (valueOfPins - 1); i++) {
       var pin = window.pin.createPin(rents[i]);
 
-      onClickPin(pin, rents[i]);
+      onPinClick(pin, rents[i]);
 
       fragment.appendChild(pin);
     }
@@ -154,6 +149,10 @@
     pinsCollections.forEach(function (pin) {
       pin.remove();
     });
+  };
+
+  var onMapPinMousedown = function () {
+    activatePage();
   };
 
   mapPinMain.addEventListener('mousedown', function (evt) {
@@ -194,7 +193,7 @@
       upEvt.preventDefault();
       if (!state.isDataLoaded) {
         activatePage();
-        window.backend.load(loadSuccessHandler, window.message.loaderrorHandler);
+        window.backend.load(onLoadSuccess, window.message.onLoadError);
       }
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
@@ -205,7 +204,7 @@
     document.addEventListener('mouseup', onMouseUp);
   });
 
-  var loadSuccessHandler = function (pin) {
+  var onLoadSuccess = function (pin) {
     offers = pin;
     drawAllPins();
     state.isDataLoaded = true;
@@ -216,10 +215,6 @@
     removePins();
     closeCard();
     createPins(window.filters.getFilteredData(offers));
-  };
-
-  var changeTypeHandler = function () {
-    drawAllPins();
   };
 
   deactivatePage();
@@ -234,7 +229,6 @@
     resetMainPinCoordinates: resetMainPinCoordinates,
     mapFilters: mapFilters,
     removePins: removePins,
-    changeTypeHandler: changeTypeHandler,
     drawAllPins: drawAllPins,
   };
 
