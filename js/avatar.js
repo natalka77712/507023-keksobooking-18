@@ -4,6 +4,7 @@
   var IMAGE_WIDTH = 70;
   var IMAGE_HEIGHT = 70;
   var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
+  var defaultAvatar = 'img/muffin-grey.svg';
   var fileChooserAvatar = document.querySelector('.ad-form__field input[type=file]');
   var previewAvatar = document.querySelector('.ad-form-header__preview img');
   var fileChooserPhoto = document.querySelector('.ad-form__upload input[type=file]');
@@ -13,13 +14,16 @@
     var photoCard = document.createElement('img');
     photoCard.width = IMAGE_WIDTH;
     photoCard.height = IMAGE_HEIGHT;
-    photoCard.style.backgroundSize = 'contain';
-    photoCard.style.backgroundPosition = 'center';
-    photoCard.style.backgroundRepeat = 'no-repeat';
+    photoCard.style.objectFit = 'contain';
+    photoCard.style.objectPosition = 'center';
     return photoCard;
   };
 
-  var deleteImage = function () {
+  var resetAvatar = function () {
+    previewAvatar.src = defaultAvatar;
+  };
+
+  var resetFotos = function () {
     var image = previewPhoto.querySelectorAll('img');
     image.forEach(function (pic) {
       pic.remove();
@@ -56,6 +60,7 @@
   fileChooserPhoto.addEventListener('change', onPhotoLoad);
 
   window.avatar = {
-    deleteImage: deleteImage,
+    resetFotos: resetFotos,
+    resetAvatar: resetAvatar,
   };
 })();

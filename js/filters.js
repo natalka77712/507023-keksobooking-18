@@ -12,7 +12,7 @@
   var filterByHousingPrice = window.map.mapFilters.querySelector('[name="housing-price"]');
   var filterByHousingRooms = window.map.mapFilters.querySelector('[name="housing-rooms"]');
   var filterByHousingGuests = window.map.mapFilters.querySelector('[name="housing-guests"]');
-  var filterByHousingFeatures = document.querySelectorAll('#housing-features input');
+  var filterByHousingFeatures = document.querySelectorAll('input:checked');
 
   var debounce = function (cb) {
     var lastTimeout = null;

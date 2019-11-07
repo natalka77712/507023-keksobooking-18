@@ -120,7 +120,8 @@
     document.addEventListener('keydown', onEnterPressEvent);
     removePins();
     closeCard();
-    window.avatar.deleteImage();
+    window.avatar.resetFotos();
+    window.avatar.resetAvatar();
     state.isDataLoaded = false;
   };
 
