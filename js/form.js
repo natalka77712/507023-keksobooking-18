@@ -84,7 +84,10 @@
     window.map.fillInnAddress();
   };
 
-  var onFormSubmitError = window.message.onLoadError;
+  var onFormSubmitError = function () {
+    window.message.onLoadError();
+    window.map.deactivatePage();
+  };
 
   window.map.adForm.addEventListener('submit', function (evt) {
     evt.preventDefault();
