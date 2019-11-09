@@ -5,7 +5,7 @@
   var ESC_KEYCODE = 27;
   var ENTER_KEYCODE = 13;
   var MIN_X = 0;
-
+  var PIN_TAIL = 33;
   var activeMode = false;
   var VALUE_OF_PINS = 5;
   var map = document.querySelector('.map');
@@ -28,9 +28,9 @@
   };
 
   var fillInnAddress = function () {
-    var top = window.map.mapPinMain.offsetTop;
-    var x = window.map.mapPinMain.offsetLeft + window.map.mapPinMain.offsetWidth / 2;
-    var y = activeMode ? (top + window.map.mapPinMain.offsetHeight) : (top + window.map.mapPinMain.offsetHeight / 2);
+    var top = mapPinMain.offsetTop;
+    var x = mapPinMain.offsetLeft + mapPinMain.offsetWidth / 2;
+    var y = activeMode ? (top + mapPinMain.offsetHeight) : (top + mapPinMain.offsetHeight / 2 - PIN_TAIL);
 
     hotelAddress.value = Math.round(x) + ', ' + Math.round(y);
   };
@@ -42,9 +42,11 @@
 
   var closeCard = function () {
     var cardMark = document.querySelector('.map__card');
+    var activeMapPin = document.querySelector('.map__pin--active');
 
     if (cardMark) {
       cardMark.remove();
+      activeMapPin .classList.remove('map__pin--active');
       document.removeEventListener('keydown', onPinEscPress);
     }
   };
@@ -59,6 +61,7 @@
     element.addEventListener('click', function () {
       closeCard();
       addCard(data);
+      element.classList.add('map__pin--active');
 
       var CardCloseButton = document.querySelector('.popup__close');
 
