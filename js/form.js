@@ -86,7 +86,6 @@
 
   var onFormSubmitError = function () {
     window.message.onLoadError();
-    window.map.deactivatePage();
   };
 
   window.map.adForm.addEventListener('submit', function (evt) {

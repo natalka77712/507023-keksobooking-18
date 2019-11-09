@@ -4,12 +4,12 @@
 
   var main = document.body.querySelector('main');
 
-  var onLoadError = function (error) {
+  var onLoadError = function () {
     var errorTemplate = document.querySelector('#error').content;
     var errorWindow = errorTemplate.cloneNode(true).querySelector('.error');
     var errorMessage = errorWindow.querySelector('.error__message');
     var errorButton = errorWindow.querySelector('.error__button');
-    errorMessage.textContent = error;
+    errorMessage.innerHTML = errorMessage.textContent;
 
     main.appendChild(errorWindow);
 
