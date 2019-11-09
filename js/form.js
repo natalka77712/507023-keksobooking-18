@@ -31,6 +31,7 @@
 
   var reset = function () {
     window.map.adForm.reset();
+    window.map.mapFilters.reset();
   };
 
   var setValidateInputPrice = function () {
