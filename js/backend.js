@@ -5,13 +5,14 @@
   var URL_LOAD = 'https://js.dump.academy/keksobooking/data';
   var URL__UPLOAD = 'https://js.dump.academy/keksobooking';
   var TIMEOUT = 10000;
+  var SUCCESS = 200;
 
   var load = function (onLoad, onError) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
 
     xhr.addEventListener('load', function () {
-      if (xhr.status === 200) {
+      if (xhr.status === SUCCESS) {
         onLoad(xhr.response);
       } else {
         onError('Ошибка загрузки объявления');
@@ -38,7 +39,7 @@
     xhr.responseType = 'json';
 
     xhr.addEventListener('load', function () {
-      if (xhr.status === 200) {
+      if (xhr.status === SUCCESS) {
         onLoad(xhr.response);
       } else {
         onError('При отправке данных произошла ошибка');

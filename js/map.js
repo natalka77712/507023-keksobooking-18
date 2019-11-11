@@ -2,8 +2,6 @@
 
 (function () {
 
-  var ESC_KEYCODE = 27;
-  var ENTER_KEYCODE = 13;
   var MIN_X = 0;
   var PIN_TAIL = 33;
   var activeMode = false;
@@ -47,14 +45,12 @@
     if (cardMark) {
       cardMark.remove();
       activeMapPin .classList.remove('map__pin--active');
-      document.removeEventListener('keydown', onPinEscPress);
+      window.removeEventListener('keydown', onWindowKeydown);
     }
   };
 
-  var onPinEscPress = function (evt) {
-    if (evt.keyCode === ESC_KEYCODE) {
-      closeCard();
-    }
+  var onWindowKeydown = function (evt) {
+    window.utils.onKeyEscPress(evt, closeCard);
   };
 
   var onPinClick = function (element, data) {
@@ -69,19 +65,19 @@
         closeCard();
       });
 
-      document.addEventListener('keydown', onPinEscPress);
+      document.addEventListener('keydown', onWindowKeydown);
     });
   };
 
   var addCard = function (advItem) {
-    var advertisment = window.card.createCard(advItem);
+    var advertisment = window.card.create(advItem);
     map.insertBefore(advertisment, mapFiltersContainer);
   };
 
   var onEnterPressEvent = function (evt) {
-    if (evt.keyCode === ENTER_KEYCODE) {
+    if (evt.keyCode === window.utils.ENTER_KEYCODE) {
       if (!state.isDataLoaded) {
-        window.backend.load(onLoadSuccess, window.message.onLoadError);
+        window.backend.load(onLoadSuccess, window.message.onLoad);
       }
       activatePage();
       fillInnAddress();
@@ -117,14 +113,14 @@
   };
 
   var deactivatePage = function () {
+    closeCard();
+    var pinsCollections = map.querySelectorAll('.map__pin:not(.map__pin--main)');
     map.classList.add('map--faded');
     setDisabledFieldSet();
     deactivateFilters();
     document.addEventListener('keydown', onEnterPressEvent);
-    removePins();
-    closeCard();
-    window.avatar.resetFotos();
-    window.avatar.resetAvatar();
+    removePins(pinsCollections);
+    window.avatar.reset();
     state.isDataLoaded = false;
   };
 
@@ -140,7 +136,7 @@
     var valueOfPins = (rents.length >= VALUE_OF_PINS) ? VALUE_OF_PINS : rents.length;
 
     for (var i = 0; i <= (valueOfPins - 1); i++) {
-      var pin = window.pin.createPin(rents[i]);
+      var pin = window.pin.create(rents[i]);
 
       onPinClick(pin, rents[i]);
 
@@ -148,13 +144,6 @@
     }
 
     pinList.appendChild(fragment);
-  };
-
-  var removePins = function () {
-    var pinsCollections = map.querySelectorAll('.map__pin:not(.map__pin--main)');
-    pinsCollections.forEach(function (pin) {
-      pin.remove();
-    });
   };
 
   var onMapPinMousedown = function () {
@@ -184,7 +173,7 @@
       var currentY = mapPinMain.offsetTop - shift.y;
       var currentX = mapPinMain.offsetLeft - shift.x;
 
-      if (currentY >= window.data.MIN_Y && currentY <= window.data.MAX_Y) {
+      if (currentY >= window.utils.MIN_Y && currentY <= window.utils.MAX_Y) {
         mapPinMain.style.top = currentY + 'px';
       }
 
@@ -199,7 +188,7 @@
       upEvt.preventDefault();
       if (!state.isDataLoaded) {
         activatePage();
-        window.backend.load(onLoadSuccess, window.message.onLoadError);
+        window.backend.load(onLoadSuccess, window.message.onLoad);
       }
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
@@ -217,25 +206,29 @@
     activateFilters();
   };
 
+  var removePins = function (pins) {
+    for (var i = 0; i < pins.length; i++) {
+      pins[i].remove();
+    }
+  };
+
   var drawAllPins = function () {
-    removePins();
     closeCard();
-    createPins(window.filters.getFilteredData(offers));
+    var pinsCollections = map.querySelectorAll('.map__pin:not(.map__pin--main)');
+    removePins(pinsCollections);
+    createPins(window.filters.getFiltered(offers));
   };
 
   deactivatePage();
 
   window.map = {
-    createPins: createPins,
     adForm: adForm,
     mapPinMain: mapPinMain,
-    ESC_KEYCODE: ESC_KEYCODE,
     deactivatePage: deactivatePage,
-    fillInnAddress: fillInnAddress,
-    resetMainPinCoordinates: resetMainPinCoordinates,
+    fillInn: fillInnAddress,
+    resetMainPin: resetMainPinCoordinates,
     mapFilters: mapFilters,
-    removePins: removePins,
-    drawAllPins: drawAllPins,
+    draw: drawAllPins,
   };
 
 })();

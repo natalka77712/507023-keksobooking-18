@@ -29,9 +29,7 @@
     };
 
     var onMessageErrorEscPress = function (evt) {
-      if (evt.keyCode === window.map.ESC_KEYCODE) {
-        closeErrorWindow();
-      }
+      window.utils.onKeyEscPress(evt, onMapClickOpen);
     };
 
     document.addEventListener('click', onMapClickOpen);
@@ -57,9 +55,7 @@
     };
 
     var onMessageSuccessEscPress = function (evt) {
-      if (evt.keyCode === window.map.ESC_KEYCODE) {
-        closeSuccessWindow();
-      }
+      window.utils.onKeyEscPress(evt, closeSuccessWindow);
     };
 
     document.addEventListener('keydown', onMessageSuccessEscPress);
@@ -67,8 +63,8 @@
   };
 
   window.message = {
-    onLoadError: onLoadError,
-    showSuccessMessage: showSuccessMessage,
+    onLoad: onLoadError,
+    showSuccess: showSuccessMessage,
   };
 
 })();

@@ -19,11 +19,8 @@
     return photoCard;
   };
 
-  var resetAvatar = function () {
+  var resetPhotos = function () {
     previewAvatar.src = defaultAvatar;
-  };
-
-  var resetFotos = function () {
     var image = previewPhoto.querySelectorAll('img');
     image.forEach(function (pic) {
       pic.remove();
@@ -60,7 +57,6 @@
   fileChooserPhoto.addEventListener('change', onPhotoLoad);
 
   window.avatar = {
-    resetFotos: resetFotos,
-    resetAvatar: resetAvatar,
+    reset: resetPhotos,
   };
 })();

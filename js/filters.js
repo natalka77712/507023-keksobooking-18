@@ -12,7 +12,7 @@
   var filterByHousingPrice = window.map.mapFilters.querySelector('[name="housing-price"]');
   var filterByHousingRooms = window.map.mapFilters.querySelector('[name="housing-rooms"]');
   var filterByHousingGuests = window.map.mapFilters.querySelector('[name="housing-guests"]');
-  var filterByHousingFeatures = document.querySelectorAll('input:checked');
+  var filterByHousingFeatures = document.querySelectorAll('#housing-features input');
 
   var debounce = function (cb) {
     var lastTimeout = null;
@@ -87,12 +87,12 @@
   };
 
   var onfilterChange = debounce(function () {
-    window.map.drawAllPins();
+    window.map.draw();
   });
 
   window.map.mapFilters.addEventListener('change', onfilterChange);
 
   window.filters = {
-    getFilteredData: getFilteredData,
+    getFiltered: getFilteredData,
   };
 })();
