@@ -19,12 +19,16 @@
     return photoCard;
   };
 
+  var removeItems = function (data) {
+    for (var i = 0; i < data.length; i++) {
+      data[i].remove();
+    }
+  };
+
   var resetPhotos = function () {
     previewAvatar.src = defaultAvatar;
     var image = previewPhoto.querySelectorAll('img');
-    image.forEach(function (pic) {
-      pic.remove();
-    });
+    removeItems(image);
   };
 
   var loadFile = function (chooser, photo) {
@@ -58,5 +62,6 @@
 
   window.avatar = {
     reset: resetPhotos,
+    removeItems: removeItems,
   };
 })();

@@ -119,7 +119,7 @@
     setDisabledFieldSet();
     deactivateFilters();
     document.addEventListener('keydown', onEnterPressEvent);
-    removePins(pinsCollections);
+    window.avatar.removeItems(pinsCollections);
     window.avatar.reset();
     state.isDataLoaded = false;
   };
@@ -206,16 +206,10 @@
     activateFilters();
   };
 
-  var removePins = function (pins) {
-    for (var i = 0; i < pins.length; i++) {
-      pins[i].remove();
-    }
-  };
-
   var drawAllPins = function () {
     closeCard();
     var pinsCollections = map.querySelectorAll('.map__pin:not(.map__pin--main)');
-    removePins(pinsCollections);
+    window.avatar.removeItems(pinsCollections);
     createPins(window.filters.getFiltered(offers));
   };
 
